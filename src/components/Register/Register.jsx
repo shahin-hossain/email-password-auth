@@ -4,7 +4,7 @@ const Register = () => {
     const [email, setEmail] = useState('');
 
     const handleSubmit = (event) => {
-        event.preventDefault() // preventDefault ছাড়া form submit করলে page refresh হয়ে যাবে, অন্য কথাও চলে যাবে। যদি আমরা এটা আটকাতে চাই এবং refresh ছাড়া আমরা data কে পেতে চাই তাহলে preventDefault ব্যবহার করতে হবে।
+        event.preventDefault() // preventDefault ছাড়া form submit করলে page reload হয়ে যাবে, অন্য কথাও চলে যাবে। যদি আমরা এটা আটকাতে চাই এবং reload ছাড়া আমরা data কে পেতে চাই তাহলে preventDefault ব্যবহার করতে হবে।
         // console.log(event.target.email.value) //এখানে email টা হলো input এর name
         // console.log(event.target.password.value) //এখানে password টা হলো input এর name
         const email = event.target.email.value;
