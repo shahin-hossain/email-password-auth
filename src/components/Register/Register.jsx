@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth'
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from 'firebase/auth'
 import app from '../../firebase/firebase.config';
+import { Link } from 'react-router-dom';
+
+const auth = getAuth(app);
 
 const Register = () => {
     const [email, setEmail] = useState('');
     const [error, setError] = useState(''); //error message দেখানোর জন্য।
     const [success, setSuccess] = useState(''); // ‍success message দেখানোর জন্য।
-
-    const auth = getAuth(app);
 
     const handleSubmit = (event) => {
         //1. prevent page Refresh/Reload
@@ -20,7 +21,7 @@ const Register = () => {
         //2. collect form data
         const email = event.target.email.value;
         const password = event.target.password.value;
-        // console.log(email, password)
+        console.log(email, password);
 
         if (!/(?=.*[A-Z])/.test(password)) { //এখানে চেক করা হয়ে যদি A-Z পর্যন্ত password এর মধ্যে না থাকে তাহলে error show করবে।
             setError('Please Add at least one uppercase')
@@ -43,6 +44,7 @@ const Register = () => {
                 setError('') // ‍login successful হলে, তাহলে error message empty হয়ে যাবে।
                 event.target.reset() //login হওয়ার পরে input field Empty করার জন্য।
                 setSuccess('User has been created successfully')
+                sendVerificationEmail(result.user)
             })
             .catch(error => {
                 console.error(error.message)
@@ -50,6 +52,16 @@ const Register = () => {
                 setSuccess('') //যদি success না হয় তাহলে Message Empty হয়ে যাবে।
             })
     }
+    //send Email Verification 
+    const sendVerificationEmail = (user) => {
+        sendEmailVerification(user)
+            .then(result => {
+                console.log(result)
+                alert('Please Verify your email address')
+            })
+
+    }
+
     const handleEmailChange = (event) => {
         setEmail(event.target.value)
         // console.log(event.target.value)
@@ -69,6 +81,7 @@ const Register = () => {
                 <br />
                 <input className='btn btn-primary' type="submit" value='Register' />
             </form>
+            <p><small>Already have an account? Please <Link to='/login'>Login</Link></small></p>
             <p className='text-danger'> {error}</p>
             <p className='text-success fw-bold'>{success}</p>
 

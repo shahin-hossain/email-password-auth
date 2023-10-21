@@ -1,5 +1,9 @@
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
+import app from '../../firebase/firebase.config';
+import { Link } from 'react-router-dom';
 
+const auth = getAuth(app);
 const Login = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -18,12 +22,29 @@ const Login = () => {
             return;
         }
         else if (!/(?=.*[!@#$&*])/.test(password)) {
-            setError('Please add al least two special characters.')
+            setError('Please add al least one special characters.')
             return;
         }
         else if (password.length < 6) {
             setError('Password must be 6 characters long.')
         }
+
+        signInWithEmailAndPassword(auth, email, password)
+            .then(result => {
+                const loggedUser = result.user;
+                console.log(loggedUser)
+                if (!loggedUser.emailVerified) {
+                    alert('Your Account is not Verified')
+                    return;
+                }
+                setSuccess('User Login successful')
+                setError('');
+
+            })
+            .catch(error => {
+                setError(error.message);
+                setSuccess('');
+            })
     }
     return (
         <div className='w-25 mx-auto'>
@@ -62,6 +83,7 @@ const Login = () => {
                 </div>
                 <button type="submit" className="btn btn-primary btn-block">Login</button>
             </form>
+            <p><small>New this website please <Link to='/register'>Register</Link></small></p>
             <p className='text-danger'>{error}</p>
             <p className='text-success'>{success}</p>
 
