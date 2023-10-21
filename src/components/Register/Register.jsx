@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from 'firebase/auth'
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, updateProfile } from 'firebase/auth'
 import app from '../../firebase/firebase.config';
 import { Link } from 'react-router-dom';
 
@@ -21,7 +21,9 @@ const Register = () => {
         //2. collect form data
         const email = event.target.email.value;
         const password = event.target.password.value;
+        const name = event.target.name.value
         console.log(email, password);
+        console.log(name)
 
         if (!/(?=.*[A-Z])/.test(password)) { //এখানে চেক করা হয়ে যদি A-Z পর্যন্ত password এর মধ্যে না থাকে তাহলে error show করবে।
             setError('Please Add at least one uppercase')
@@ -45,6 +47,7 @@ const Register = () => {
                 event.target.reset() //login হওয়ার পরে input field Empty করার জন্য।
                 setSuccess('User has been created successfully')
                 sendVerificationEmail(result.user)
+                updateUserData(result.user, name)
             })
             .catch(error => {
                 console.error(error.message)
@@ -52,6 +55,7 @@ const Register = () => {
                 setSuccess('') //যদি success না হয় তাহলে Message Empty হয়ে যাবে।
             })
     }
+
     //send Email Verification 
     const sendVerificationEmail = (user) => {
         sendEmailVerification(user)
@@ -61,7 +65,19 @@ const Register = () => {
             })
 
     }
+    //user profile update  
 
+    const updateUserData = (user, name) => {
+        updateProfile(user, {
+            displayName: name
+        })
+            .then(() => {
+                console.log('user Name Updated')
+            })
+            .catch(error => {
+                setError(error.message)
+            })
+    }
     const handleEmailChange = (event) => {
         setEmail(event.target.value)
         // console.log(event.target.value)
@@ -74,6 +90,8 @@ const Register = () => {
         <div className='w-50 mx-auto '>
             <h2>Please Register</h2>
             <form onSubmit={handleSubmit}>
+                <input className='w-50 mb-4 rounded p-2 outline' onChange={handleEmailChange} type='text' name='name' id='name' placeholder='Your Name' required />
+                <br />
                 {/* onChange দিয়ে event target করলে প্রতি key click এ event টিগার হবে এতে করে আলাদা আলাদা ভাবে show করবে console এ। এটা একটা পদ্ধতি*/}
                 <input className='w-50 mb-4 rounded p-2 outline' onChange={handleEmailChange} type='email' name='email' id='email' placeholder='email' required />
                 <br />

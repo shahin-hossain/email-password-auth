@@ -1,12 +1,15 @@
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import React, { useState } from 'react';
+import { getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useRef, useState } from 'react';
 import app from '../../firebase/firebase.config';
 import { Link } from 'react-router-dom';
 
 const auth = getAuth(app);
+
 const Login = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const emailRef = useRef(); // useRef use করার কারণ হলো, সরাসরি input Field থেকে data কে Hook করে emailRef এর মধ্যে store করার জন্য।
+
     const handleLogin = (event) => {
         event.preventDefault()
 
@@ -14,6 +17,7 @@ const Login = () => {
         const email = form.email.value;
         const password = form.password.value;
         console.log(email, password)
+
         //login Validation 
         //login এ সাধারনত validation করার দরকার নেই, ঐটা শুধু registration এ করতে হবে।
         setError('') //reset error
@@ -29,13 +33,15 @@ const Login = () => {
             setError('Password must be 6 characters long.')
         }
 
+        // sign in email & password pass
+
         signInWithEmailAndPassword(auth, email, password)
             .then(result => {
                 const loggedUser = result.user;
                 console.log(loggedUser)
                 if (!loggedUser.emailVerified) {
                     alert('Your Account is not Verified')
-                    return;
+                    // return;
                 }
                 setSuccess('User Login successful')
                 setError('');
@@ -44,6 +50,22 @@ const Login = () => {
             .catch(error => {
                 setError(error.message);
                 setSuccess('');
+            })
+    }
+
+    //Reset Password
+    const handleResetPassword = event => {
+        const email = emailRef.current.value;
+        if (!email) {
+            alert('please provide your email address to reset')
+        }
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                alert('Please Check Your Email')
+            })
+            .catch(error => {
+                console.log(error)
+                setError(error.message)
             })
     }
     return (
@@ -59,6 +81,7 @@ const Login = () => {
                         className="form-control"
                         id="email"
                         placeholder="Enter your username"
+                        ref={emailRef} //react এর একটি Props হলো এ ref={}
                         required
                     />
                 </div>
@@ -83,6 +106,7 @@ const Login = () => {
                 </div>
                 <button type="submit" className="btn btn-primary btn-block">Login</button>
             </form>
+            <p>Forget Password ? Please <button onClick={handleResetPassword} className='btn btn-link'>Reset Password</button></p>
             <p><small>New this website please <Link to='/register'>Register</Link></small></p>
             <p className='text-danger'>{error}</p>
             <p className='text-success'>{success}</p>
