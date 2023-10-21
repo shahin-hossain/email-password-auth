@@ -1,9 +1,70 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const Login = () => {
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const handleLogin = (event) => {
+        event.preventDefault()
+
+        const form = event.target;
+        const email = form.email.value;
+        const password = form.password.value;
+        console.log(email, password)
+        //login Validation 
+        //login এ সাধারনত validation করার দরকার নেই, ঐটা শুধু registration এ করতে হবে।
+        setError('') //reset error
+        if (!/(?=.*[A-Z].*[A-Z])/.test(password)) {
+            setError('Please add at least two uppercase letter.')
+            return;
+        }
+        else if (!/(?=.*[!@#$&*])/.test(password)) {
+            setError('Please add al least two special characters.')
+            return;
+        }
+        else if (password.length < 6) {
+            setError('Password must be 6 characters long.')
+        }
+    }
     return (
-        <div>
-            <h2>This is login page</h2>
+        <div className='w-25 mx-auto'>
+
+            <form onSubmit={handleLogin}>
+                <h2 className="text-center">Login</h2>
+                <div className="form-group mb-3">
+                    <label htmlFor="email">Username</label>
+                    <input
+                        type="email"
+                        name="email"
+                        className="form-control"
+                        id="email"
+                        placeholder="Enter your username"
+                        required
+                    />
+                </div>
+                <div className="form-group mb-3">
+                    <label htmlFor="password">Password</label>
+                    <input
+                        type="password"
+                        name="password"
+                        className="form-control"
+                        id="password"
+                        placeholder="Enter your password"
+                        required
+                    />
+                </div>
+                <div className="form-check mb-3">
+                    <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="rememberMe"
+                    />
+                    <label className="form-check-label" htmlFor="rememberMe">Remember Me</label>
+                </div>
+                <button type="submit" className="btn btn-primary btn-block">Login</button>
+            </form>
+            <p className='text-danger'>{error}</p>
+            <p className='text-success'>{success}</p>
+
         </div>
     );
 };
